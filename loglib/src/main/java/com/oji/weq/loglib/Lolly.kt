@@ -106,7 +106,11 @@ class Lolly : Service() {
         mWM!!.defaultDisplay.getMetrics(mDisplayMetrics)
         mWMLayoutParams = WindowManager.LayoutParams()
         mWMLayoutParams!!.screenOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-        mWMLayoutParams!!.type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            mWMLayoutParams!!.type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
+        } else {
+            mWMLayoutParams!!.type = WindowManager.LayoutParams.TYPE_SYSTEM_ERROR
+        }
         mWMLayoutParams!!.format = PixelFormat.TRANSLUCENT
         mWMLayoutParams!!.gravity = Gravity.START or Gravity.TOP
         mWMLayoutParams!!.x = 0
@@ -151,17 +155,17 @@ class Lolly : Service() {
             }
         })
 
-        mOrientationBtn!!.setOnClickListener {
-            if (mWMLayoutParams!!.screenOrientation == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
-                mWMLayoutParams!!.screenOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-                mWM!!.updateViewLayout(mLolly, mWMLayoutParams)
-                mOrientationBtn!!.text = "V"
-            } else {
-                mWMLayoutParams!!.screenOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-                mWM!!.updateViewLayout(mLolly, mWMLayoutParams)
-                mOrientationBtn!!.text = "H"
-            }
-        }
+//        mOrientationBtn!!.setOnClickListener {
+//            if (mWMLayoutParams!!.screenOrientation == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
+//                mWMLayoutParams!!.screenOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+//                mWM!!.updateViewLayout(mLolly, mWMLayoutParams)
+//                mOrientationBtn!!.text = "V"
+//            } else {
+//                mWMLayoutParams!!.screenOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+//                mWM!!.updateViewLayout(mLolly, mWMLayoutParams)
+//                mOrientationBtn!!.text = "H"
+//            }
+//        }
 
         mShowContainerBtn!!.setOnClickListener {
             if (mContainer!!.visibility == View.VISIBLE) {
@@ -430,7 +434,7 @@ class Lolly : Service() {
         mOrientationBtn = Button(this)
         lpc = ViewGroup.LayoutParams(getDip(40), ViewGroup.LayoutParams.WRAP_CONTENT)
         mOrientationBtn!!.layoutParams = lpc
-        mOrientationBtn!!.text = "H"
+//        mOrientationBtn!!.text = "H"
 
         //mShowContainerBtn
         mShowContainerBtn = Button(this)
@@ -732,6 +736,8 @@ class Lolly : Service() {
     }
     companion object{
 
+         var isShowing: Boolean = false
+
         /**
          * 将Lolly窗口显示在设备屏幕上
          */
@@ -756,16 +762,18 @@ class Lolly : Service() {
          * @param activity
          * @param tags     自定义tag
          */
-        fun showLolly(activity: Activity, tags: Array<String>) {
+        fun showLolly(activity: Context, tags: Array<String>) {
             try {
-                val info = activity.packageManager.getActivityInfo(activity.componentName, PackageManager.GET_META_DATA)
+//                val info = activity.packageManager.getActivityInfo(activity.componentName, PackageManager.GET_META_DATA)
                 val start = Intent(activity, Lolly::class.java)
                 start.putExtra("action", FLAG_INIT_ADD_WINDOW)
                 start.putExtra(LOLLY_TAGS, tags)
-                start.putExtra(LOLLY_ORIENTATION, info.screenOrientation)
+//                start.putExtra(LOLLY_ORIENTATION, info.screenOrientation)
                 activity.startService(start)
+                isShowing = true
             } catch (e: PackageManager.NameNotFoundException) {
                 e.printStackTrace()
+                Log.e("dadadad","showLolly e:${e.message}")
             }
 
         }
@@ -775,6 +783,7 @@ class Lolly : Service() {
             start.putExtra("action", FLAG_INIT_ADD_WINDOW)
             start.putExtra(LOLLY_TAGS, tags)
             service.startService(start)
+            isShowing = true
         }
 
         /**
@@ -787,6 +796,7 @@ class Lolly : Service() {
             stop.putExtra("action", FLAG_REMOVE_WINDOW)
             stop.addFlags(FLAG_REMOVE_WINDOW)
             context.startService(stop)
+            isShowing = false
         }
 
         /**

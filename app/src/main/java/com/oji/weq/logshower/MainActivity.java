@@ -54,18 +54,18 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        final Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                Log.i("dadadad","this is Lolly");
-                Log.d("dadadad","this is Lolly");
-                Log.v("dadadad","this is Lolly");
-                Log.e("dadadad","this is Lolly");
-                Log.w("dadadad","this is Lolly");
-                handler.postDelayed(this, 2000);
-            }
-        }, 2000);
+//        final Handler handler = new Handler();
+//        handler.postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                Log.i("dadadad","this is Lolly");
+//                Log.d("dadadad","this is Lolly");
+//                Log.v("dadadad","this is Lolly");
+//                Log.e("dadadad","this is Lolly");
+//                Log.w("dadadad","this is Lolly");
+//                handler.postDelayed(this, 2000);
+//            }
+//        }, 2000);
 
     }
 }
